@@ -5,14 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProductCatalog.DTO;
 using ProductCatalog.DTO.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static ProductCatalog.Constants.Constants.ErrorMessages;
-using static ProductCatalog.Constants.Constants.Controllers;
 using static ProductCatalog.Constants.Constants;
+using static ProductCatalog.Constants.Constants.Controllers;
+using static ProductCatalog.Constants.Constants.ErrorMessages;
 
 namespace ProductCatalog.AdminClient.Controllers
 {
@@ -33,22 +34,30 @@ namespace ProductCatalog.AdminClient.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(AuthentificationModelDTO request)
         {
-            var content = JsonContent.Create(request);
-            var jsonResponseMessage = await HttpClient.PostAsync(loginUrl, content);
-
-            if (!jsonResponseMessage.IsSuccessStatusCode)
+            try
             {
-                TempData[ErrorMessage] = await jsonResponseMessage.Content.ReadAsStringAsync();
-                return View();
+                var content = JsonContent.Create(request);
+                var jsonResponseMessage = await HttpClient.PostAsync(loginUrl, content);
+
+                if (!jsonResponseMessage.IsSuccessStatusCode)
+                {
+                    TempData[ErrorMessage] = await jsonResponseMessage.Content.ReadAsStringAsync();
+                    return View();
+                }
+
+                var responseContent = await jsonResponseMessage.Content.ReadAsStringAsync();
+                var authDetails = JsonConvert.DeserializeObject<AuthentificationDetails>(responseContent);
+
+                if(authDetails.Role.Equals(Roles.Admin))
+                    await Authenticate(authDetails);
+
+                return RedirectToAction(Views.Index, Admin);
             }
-
-            var responseContent = await jsonResponseMessage.Content.ReadAsStringAsync();
-            var authDetails = JsonConvert.DeserializeObject<AuthentificationDetails>(responseContent);
-
-            if(authDetails.Role.Equals(Roles.Admin))
-                await Authenticate(authDetails);
-
-            return RedirectToAction(Views.Index, Admin);
+            catch (Exception ex)
+            {
+                TempData[ErrorMessage] = ServerError + ex.Message;
+                return RedirectToAction(Views.Login);
+            }
         }
 
         public async Task<IActionResult> Logout()

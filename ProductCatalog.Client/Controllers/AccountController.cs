@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProductCatalog.DTO;
 using ProductCatalog.DTO.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -35,17 +36,25 @@ namespace ProductCatalog.Client.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegistrationModelDTO model)
         {
-            var content = JsonContent.Create(model);
-            var jsonResponse = await HttpClient.PostAsync(registerUrl, content);
-                
-            if (!jsonResponse.IsSuccessStatusCode)
+            try
             {
-                TempData[ErrorMessage] = await jsonResponse.Content.ReadAsStringAsync();
-                return View();
-            }
+                var content = JsonContent.Create(model);
+                var jsonResponse = await HttpClient.PostAsync(registerUrl, content);
 
-            TempData[SuccessMessage] = await jsonResponse.Content.ReadAsStringAsync();
-            return RedirectToAction(Views.Login);
+                if (!jsonResponse.IsSuccessStatusCode)
+                {
+                    TempData[ErrorMessage] = await jsonResponse.Content.ReadAsStringAsync();
+                    return View();
+                }
+
+                TempData[SuccessMessage] = await jsonResponse.Content.ReadAsStringAsync();
+                return RedirectToAction(Views.Login);
+            }
+            catch (Exception ex)
+            {
+                TempData[ErrorMessage] = ServerError + ex.Message;
+                return RedirectToAction(Views.Login);
+            }
         }
 
         [HttpGet]
@@ -57,20 +66,28 @@ namespace ProductCatalog.Client.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(AuthentificationModelDTO request)
         {
-            var content = JsonContent.Create(request);
-            var jsonResponseMessage = await HttpClient.PostAsync(loginUrl, content);
+            try
+            { 
+                var content = JsonContent.Create(request);
+                var jsonResponseMessage = await HttpClient.PostAsync(loginUrl, content);
 
-            if (!jsonResponseMessage.IsSuccessStatusCode)
-            {
-                TempData[ErrorMessage] = await jsonResponseMessage.Content.ReadAsStringAsync();
-                return View();
+                if (!jsonResponseMessage.IsSuccessStatusCode)
+                {
+                    TempData[ErrorMessage] = await jsonResponseMessage.Content.ReadAsStringAsync();
+                    return View();
+                }
+
+                var responseContent = await jsonResponseMessage.Content.ReadAsStringAsync();
+                var authDetails = JsonConvert.DeserializeObject<AuthentificationDetails>(responseContent);
+
+                await Authenticate(authDetails);
+                return RedirectToAction(Views.Index, Product);
             }
-
-            var responseContent = await jsonResponseMessage.Content.ReadAsStringAsync();
-            var authDetails = JsonConvert.DeserializeObject<AuthentificationDetails>(responseContent);
-
-            await Authenticate(authDetails);
-            return RedirectToAction(Views.Index, Product);
+            catch(Exception ex)
+            {
+                TempData[ErrorMessage] = ServerError + ex.Message;
+                return RedirectToAction(Views.Login);
+            }
         }
 
         public async Task<IActionResult> Logout()

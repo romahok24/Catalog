@@ -24,6 +24,7 @@
             public const string UserBlocked = "Пользователь заблокирован";
             public const string NoRoles = "У пользователя нет ролей";
             public const string UserNameExists = "Пользователь с таким именем существует.";
+            public const string ServerError = "Ошибка при обращении на сервер: ";
 
             public const string ErrorMessage = nameof(ErrorMessage);
             public const string Unauthorized = nameof(Unauthorized);
