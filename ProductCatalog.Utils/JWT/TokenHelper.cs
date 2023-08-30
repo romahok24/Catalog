@@ -62,7 +62,7 @@ namespace ProductCatalog.Utils.JWT
         {
             return new SigningCredentials(
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes("!SomethingVerySecretOmg256DoNotKnowWhatDoYouWantAAAAAAA!")
+                    Encoding.UTF8.GetBytes("secretkeyclient0")
                 ),
                 SecurityAlgorithms.HmacSha256
             );

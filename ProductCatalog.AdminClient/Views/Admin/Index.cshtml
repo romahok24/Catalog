@@ -41,9 +41,12 @@
                 @Html.DisplayFor(modelItem => item.IsBlocked)
             </td>
             <td>
-                @Html.ActionLink("Заблокировать", "Block", new { id=item.Id }) |
-                @Html.ActionLink("Изменить пароль", "UpdatePassword", new {  id=item.Id }) |
-                @Html.ActionLink("Удалить", "Delete", new { id=item.Id })
+                @if(!item.IsBlocked)
+                {
+                    <div>@Html.ActionLink("Заблокировать", "Block", new { id=item.Id })</div>
+                }
+                <div>@Html.ActionLink("Изменить пароль", "UpdatePassword", new {  id=item.Id })</div>
+                <div>@Html.ActionLink("Удалить", "Delete", new { id=item.Id })</div>
             </td>
         </tr>
 }

@@ -50,7 +50,7 @@ namespace ProductCatalog.API
                         ValidIssuer = "apiWithAuthBackend",
                         ValidAudience = "apiWithAuthBackend",
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes("!SomethingVerySecretOmg256DoNotKnowWhatDoYouWantAAAAAAA!")
+                            Encoding.UTF8.GetBytes(Configuration["Secret"])
                         ),
                     };
                 });
