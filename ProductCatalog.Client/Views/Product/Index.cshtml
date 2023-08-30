@@ -1,0 +1,143 @@
+﻿@using System.Globalization
+@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="mb-1"> 
+    <a asp-action="Create" class="btn btn-success">Добавить</a>
+    <button class="btn btn-primary" data-toggle="collapse" data-target="#demo">Фильтры</button>
+</div>
+
+<div id="demo" class="collapse">
+    <div class="container mt-1 mb-1">
+        <form asp-action="Filter" method="post" class="border p-4">
+            <div asp-validation-summary="None" class="text-danger"></div>
+            <div class="row">
+                <div class="form-group col">
+                    <input asp-for="Filter.Name" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.Name)" value="@Model.Filter?.Name">
+                </div>
+                <div class="form-group col">
+                    <input type="text" list="categoriesList" id="categoryInput" name="categoryInput" class="custom-select" placeholder="@Html.DisplayNameFor(model => model.Filter.CategoryId)" />
+                    <input type="hidden" asp-for="Filter.CategoryId" id="categoryId" value="@Model.Filter?.CategoryId" />
+                    <datalist id="categoriesList">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option data-id="@category.Id" value="@category.Name"></option>
+                        }
+                    </datalist>
+                </div>
+                <div class="form-group col">
+                    <input asp-for="Filter.Description" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.Description)" value="@Model.Filter?.Description">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <input asp-for="Filter.GeneralNote" type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.GeneralNote)" value="@Model.Filter?.GeneralNote">
+                </div>
+                @if (User.IsInRole("SuperUser"))
+                {
+                    <div class="form-group col">
+                        <input asp-for="Filter.SpecialNote" type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.SpecialNote)" value="@Model.Filter?.SpecialNote">
+                    </div>
+                }
+                <div class="form-group col">
+                    <input asp-for="Filter.PriceFrom" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.PriceFrom)" value="@Model.Filter?.PriceFrom" onkeypress="return formatInput(event, this)">
+                </div>
+                <div class="form-group col">
+                    <input asp-for="Filter.PriceTo" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Filter.PriceTo)" value="@Model.Filter?.PriceTo" onkeypress="return formatInput(event, this)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Найти</button>
+                    <a asp-action="Index" class="btn btn-danger">Сбросить</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().CategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Cost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().GeneralNote)
+            </th>
+            @if (User.IsInRole("SuperUser"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Products.FirstOrDefault().SpecialNote)
+                </th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Products) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                <div>@item.Cost.ToString("F3", CultureInfo.InvariantCulture)<span class="price-cell" title="Цена в USD:" data-trigger="hover" data-toggle="popover" data-price="@item.Cost">*</span></div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GeneralNote)
+            </td>
+                @if (User.IsInRole("SuperUser"))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.SpecialNote)
+                </td>
+                }
+            <td>
+                    @Html.ActionLink("Ред.", "Edit", new {  id=item.Id }, new { @class = "btn btn-warning" })
+                @if (User.IsInRole("SuperUser"))
+                {
+                    <p>@Html.ActionLink("Удалить", "Delete", new { id = item.Id })</p>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script>
+    var categoryInput = document.getElementById('categoryInput');
+    var categoryIdInput = document.getElementById('categoryId');
+
+    categoryInput.addEventListener('input', function () {
+        var selectedOption = categoriesList.querySelector('option[value="' + categoryInput.value + '"]');
+        if (selectedOption) {
+            categoryIdInput.value = selectedOption.getAttribute('data-id');
+        } else {
+            categoryIdInput.value = '';
+        }
+    });
+
+    var defaultOption = categoriesList.querySelector('option[data-id="@Model.Filter?.CategoryId"]');
+    if (defaultOption) {
+        categoryInput.value = defaultOption.value;
+    }
+
+    console.log(sessionStorage);
+</script>

@@ -1,0 +1,67 @@
+﻿@model IEnumerable<ProductCatalog.DTO.CategoryDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+@if (User.IsInRole("SuperUser"))
+{
+    <p>
+        <a class="btn btn-success" asp-action="Create">Добавить</a>
+    </p>
+}
+<table class="table">
+    @if (User.IsInRole("SuperUser"))
+    {
+        <colgroup>
+            <col span="1" style="width: 70%;">
+            <col span="1" style="width: 10%;">
+            <col span="1" style="width: 10%;">
+            <col span="1" style="width: 10%;">
+        </colgroup>
+    }
+    else
+    {
+        <colgroup>
+            <col span="1" style="width: 90%;">
+            <col span="1" style="width: 10%;">
+        </colgroup>
+    }
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            @if (User.IsInRole("SuperUser"))
+            {
+                <th></th>
+                <th></th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            @if (User.IsInRole("SuperUser"))
+            {
+                <td>
+                        @Html.ActionLink("Ред.", "Edit", new {  id=item.Id  }, new { @class = "btn btn-warning" })
+                </td>
+                <td>
+                        @Html.ActionLink("Удалить", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+
+                </td>
+            }
+            <td>
+                <form asp-controller="Product" asp-action="Filter" method="post">
+                    <input name="CategoryId" id="categoryId" type="hidden" value="@item.Id">
+                    <button class="btn btn-primary" type="submit">Все продукты</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProductCatalog.Constants\ProductCatalog.Constants.csproj" />
+    <ProjectReference Include="..\ProductCatalog.Data\ProductCatalog.Data.csproj" />
+    <ProjectReference Include="..\ProductCatalog.Domain\ProductCatalog.Domain.csproj" />
+    <ProjectReference Include="..\ProductCatalog.DTO\ProductCatalog.DTO.csproj" />
+    <ProjectReference Include="..\ProductCatalog.Utils\ProductCatalog.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
