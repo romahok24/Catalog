@@ -57,7 +57,7 @@ namespace ProductCatalog.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(string.Format(Log.LogExceptionPattern, status, date, path, userName, ex.Message));
+                _logger.LogError(string.Format(Log.LogExceptionPattern, status, date, path, userName, ex.Message));
                 throw;
             }
         }

@@ -13,7 +13,7 @@ namespace ProductCatalog.Data
         public static IServiceCollection AddDataLayer(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            var str = configuration.GetConnectionString("DefaultConnection");
+
             services.AddDbContext<ApplicationContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
